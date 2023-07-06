@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: php-apache
+  labels:
+    run: php-apache
+spec:
+  selector:
+    matchLables:
+      run: php-apache
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: php-apache
+    spec:
+      containers:
+      - name: php-apache
+        image: k8s.gcr.io/hpa-example
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: 500m   #One pod requesting CPU of 500m (Half of 1vCPU)  # cpu: 0.5
+            memory: 256Mi #One pod requesting 256 MiB of Memory
+          limits:
+            cpu: 1000m  #One pod CPU limit 1000m (1 vCPU)                # cpu: 1
+            memory: 512Mi #One pod limit 512 MiB of Memory
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: php-apache-service
+spec:
+  selector: 
+    run: php-apache
+  ports:
+    - protocol: TCP
+      port: 80
+      TargetPort: 80
